@@ -8,11 +8,11 @@ desplegar; no se inventan valores.
 
 | Dato | Valor |
 |---|---|
-| URL pública (frontend) | COMPLETAR (dominio HTTPS asignado por Easypanel) |
-| Revisión desplegada (commit) | COMPLETAR (`git rev-parse --short HEAD`) |
-| Repositorio / rama | COMPLETAR |
-| Fecha y hora del despliegue | COMPLETAR |
-| Proyecto de Easypanel | COMPLETAR (en la documentación previa del grupo: `grupo1-chicas`) |
+| URL pública (frontend) | https://grupo1-chicas-frontend-libreria.ugpvou.easypanel.host |
+| Revisión desplegada (commit) | `8ccb10a` |
+| Repositorio / rama | https://github.com/agusfonta/Global-Programacion, rama `main` |
+| Fecha del despliegue | 2026-11-10 (COMPLETAR: hora exacta) |
+| Proyecto de Easypanel | `grupo1-chicas` (servicios `backend-libreria`, `frontend-libreria` y `db-libreria`) |
 
 ## Servicios
 
@@ -59,9 +59,11 @@ Debe imprimir `200`.
 | Domains | dominio HTTPS asignado; protocolo interno **HTTP**, puerto de destino **80** |
 | Environment | `API_UPSTREAM=<nombre-interno-del-backend>:8000` |
 
-`API_UPSTREAM` tiene la forma `host:puerto`, sin `http://` ni barra final. Con el proyecto y el
-servicio de este grupo debería ser `grupo1-chicas_backend:8000` (**COMPLETAR**: confirmar el
-nombre interno exacto en Easypanel y anotar el valor usado).
+`API_UPSTREAM` tiene la forma `host:puerto`, sin `http://` ni barra final. Valor usado:
+`API_UPSTREAM=grupo1-chicas_backend-libreria:8000` (nombre interno `<proyecto>_<servicio>`).
+
+El host interno de PostgreSQL de este despliegue es `grupo1-chicas_db-libreria:5432`, base
+`libreria` (servicio `db-libreria`). La contraseña solo existe en el panel.
 
 ## Proxy
 
@@ -73,15 +75,20 @@ necesita CORS. El Dockerfile limita la sustitución de variables a `API_UPSTREAM
 
 ## Carga inicial de datos
 
-`backend/test/seed.sql` carga datos ficticios, pero **vacía las tablas** (`TRUNCATE ... CASCADE`)
-antes de insertar. **No se ejecuta sobre la base del despliegue**: esa base ya contiene datos y se
-conservan. Antes de publicar se comprueba que el catálogo no esté vacío:
+`backend/test/seed.sql` carga datos ficticios (5 libros, 3 clientes y 1 venta), pero **vacía las
+tablas** (`TRUNCATE ... CASCADE`) antes de insertar. Solo se ejecuta sobre una base nueva y vacía.
+
+La base `libreria` del servicio `db-libreria` era nueva: las migraciones corrieron desde cero
+(`Running upgrade -> 0001` y `0001 -> 0002` en los registros), así que se cargó el seed una vez
+desde la **Consola** del servicio `backend-libreria`:
 
 ```bash
-curl -s https://<URL-publica>/api/libros/?limit=3
+URL=$(echo "$DATABASE_URL" | sed 's/+asyncpg//')
+psql -v ON_ERROR_STOP=1 "$URL" -f test/seed.sql
 ```
 
-Si se quisiera usar el seed, hacerlo solo sobre una base nueva y vacía.
+Resultado: `COMMIT`. Comprobación: `GET /api/libros/?limit=10` devuelve 5 libros. **No volver a
+ejecutarlo** sobre esta base: borraría las ventas y los registros creados después.
 
 ## Verificación en la URL pública
 
@@ -89,18 +96,28 @@ Registrar acá lo observado (con datos ficticios), y guardar capturas en [eviden
 
 | Verificación | Resultado |
 |---|---|
-| `GET <URL>/` abre por HTTPS | COMPLETAR |
-| `GET <URL>/api/health/ready` responde 200 | COMPLETAR |
-| G-01 catálogo (búsqueda, limit/offset, sin coincidencias, detalle) | COMPLETAR |
-| G-02 alta de libro (y 409 por ISBN repetido) | COMPLETAR |
-| G-03 alta de cliente (y 409 por email repetido) | COMPLETAR |
-| G-04 venta con dos renglones y detalle tras recargar | COMPLETAR |
-| G-05 `PATCH /libros/{id}` y venta anterior sin cambios | COMPLETAR |
-| G-06 rechazos 409 y 422, historial sin cambios | COMPLETAR |
-| G-07 imagen del frontend se construye; HTTPS; datos tras redespliegue | COMPLETAR |
+Ejecutado el 2026-11-10 sobre la URL pública. Registro completo en
+[evidencia/pruebas-G01-G06-url-publica.md](evidencia/pruebas-G01-G06-url-publica.md)
+(19 verificaciones, todas correctas) y capturas
+[publica-escritorio-1280.png](evidencia/publica-escritorio-1280.png) y
+[publica-movil-375.png](evidencia/publica-movil-375.png).
 
-Ya hay evidencia **local** (no de la URL pública) de G-01 a G-06 y de la construcción de la
-imagen en [evidencia/pruebas-G01-G06.md](evidencia/pruebas-G01-G06.md) y
+| Verificación | Resultado |
+|---|---|
+| `GET <URL>/` abre por HTTPS | OK (200) |
+| `GET <URL>/api/health/ready` responde 200 | OK (200, `{"estado":"ok"}`) |
+| G-01 catálogo (búsqueda, limit/offset, sin coincidencias, detalle) | OK |
+| G-02 alta de libro (y 409 por ISBN repetido) | OK (201 y 409) |
+| G-03 alta de cliente (y 409 por email repetido) | OK (201 y 409) |
+| G-04 venta con dos renglones y detalle tras recargar | OK (201; detalle idéntico; total 42.691,00) |
+| G-05 `PATCH /libros/{id}` y venta anterior sin cambios | OK (la venta conserva 12.345,50) |
+| G-06 rechazos 409 y 422, historial sin cambios | OK (409, 409 y 422; historial igual) |
+| G-07 datos tras redespliegue | COMPLETAR (redesplegar y comprobar que siguen los datos) |
+
+No se guardaron capturas de los mensajes de error en pantalla (409/422 en la interfaz):
+COMPLETAR con capturas manuales desde la URL pública.
+
+Evidencia **local** previa de la imagen en
 [evidencia/imagen-frontend-local.md](evidencia/imagen-frontend-local.md).
 
 ## Diagnóstico
@@ -121,6 +138,9 @@ imagen en [evidencia/pruebas-G01-G06.md](evidencia/pruebas-G01-G06.md) y
 
 ## Nota sobre el despliegue previo
 
-El grupo ya tiene un backend desplegado a mano como contenedor suelto (puerto publicado propio),
-contra la misma base PostgreSQL. Se dejó funcionando y el servicio App de esta guía convive con él;
-ambos usan las mismas migraciones, que son idempotentes.
+El grupo ya tenía un backend desplegado a mano como contenedor suelto (puerto publicado propio),
+contra otra base de PostgreSQL. Se dejó funcionando y no se modificó. El servicio App de esta guía
+usa su propia base (`db-libreria`) y no comparte datos con aquel.
+
+El servicio `backend-libreria` no debe tener dominio público: Easypanel crea uno automático y hay
+que borrarlo desde Dominios (el frontend llega al backend por la red interna).
