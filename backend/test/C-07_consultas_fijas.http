@@ -1,0 +1,22 @@
+@host = http://localhost:8000
+
+# Requiere SQL_ECHO activado para ver las consultas en la consola del servidor.
+# En cada par, contar los SELECT y verificar que la cantidad es la misma.
+
+### C-07a · Detalle de un libro con UN autor
+# Esperado: 200; consola: 2 SELECT (libro + editorial + género, y autorías + autor)
+GET {{host}}/libros/1
+
+### C-07b · Detalle de un libro con TRES autores
+# Esperado: 200; consola: la MISMA cantidad de SELECT que C-07a
+GET {{host}}/libros/3
+
+### C-07c · Detalle de una venta con UN renglón
+# Esperado: 200; consola: 2 SELECT (venta + cliente, y renglones + libro)
+GET {{host}}/ventas/1
+
+### C-07d · Detalle de una venta con DOS renglones (usar el id que devolvió C-06)
+# Si se corrió seed.sql limpio y C-04/C-05 no consumieron ids intermedios, el id es 2.
+# Si se corrieron altas fallidas antes, el id puede ser 3 o mayor. Ajustar según el JSON de C-06.
+# Esperado: 200; consola: la MISMA cantidad de SELECT que C-07c
+GET {{host}}/ventas/2

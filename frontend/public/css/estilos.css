@@ -1,0 +1,697 @@
+/*
+  Librería Pampa - hoja de estilos (Ejercicio 2: CSS adaptable).
+
+  Organización: 0) guarda [hidden], 1) tokens, 2) reset y base, 3) layout,
+  4) componentes, 5) tablas, 6) mensajes, 7) foco, 8) media queries.
+  Mobile-first: la base está pensada para 320 px; los breakpoints (40em y
+  64em) solo agregan columnas y aire.
+
+  Imágenes: la página no tiene imágenes (ni img, ni svg, ni picture); el
+  requisito de texto alternativo (alt) queda cubierto por vacuidad. Los íconos
+  de los mensajes son caracteres Unicode generados con ::before (decorativos).
+
+  Contrato de mensajes para los Ejercicios 4 y 5: el JS agrega la clase
+  mensaje--error o mensaje--ok al div.mensaje-resultado, le quita el atributo
+  hidden y DESPUÉS escribe el texto, sin repetir "Error:" ni "Listo:" (el
+  prefijo lo pone el CSS). Para volver a ocultarlo basta con volver a poner
+  hidden: ninguna regla de este archivo asigna display a .mensaje,
+  .mensaje-resultado ni .mensaje-vacio.
+*/
+
+/* ==========================================================================
+   0. Guarda de [hidden]
+   ========================================================================== */
+[hidden] {
+  display: none !important;
+}
+
+/* ==========================================================================
+   1. Tokens (paleta "Pampa": verde pampa + papel cálido + ocre)
+   ========================================================================== */
+:root {
+  /* Color */
+  --color-fondo: #faf7f2;
+  --color-superficie: #ffffff;
+  --color-texto: #1f2a24;
+  --color-texto-suave: #4a5550;
+  --color-primario: #1e5b4f;
+  --color-primario-oscuro: #164539;
+  --color-primario-claro: #e3efe9;
+  --color-acento: #b5651d;
+  --color-borde: #6b726c;
+  --color-foco: #1d4ed8;
+  --color-foco-sobre-oscuro: #ffd166;
+  --color-error: #9b1c1c;
+  --color-error-fondo: #fdecec;
+  --color-ok: #1e5631;
+  --color-ok-fondo: #e6f4ea;
+  --color-aviso: #6b4500;
+  --color-aviso-fondo: #fff4d6;
+  --color-aviso-borde: #a86b00;
+  --color-info-fondo: #eef2f0;
+  --color-info-borde: #5b6b64;
+
+  /* Tipografía (solo fuentes del sistema) */
+  --fuente-base: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  --fuente-titulos: Georgia, "Iowan Old Style", "Palatino Linotype", "Book Antiqua", serif;
+  --texto-sm: 0.875rem;
+  --texto-base: 1rem;
+  --texto-md: 1.125rem;
+  --texto-lg: 1.375rem;
+  --texto-xl: 1.75rem;
+  --texto-2xl: clamp(1.5rem, 1.1rem + 2vw, 2.25rem);
+  --interlineado: 1.5;
+  --interlineado-titulos: 1.2;
+  --peso-normal: 400;
+  --peso-medio: 600;
+  --peso-fuerte: 700;
+
+  /* Espaciado (escala de 4 px) */
+  --esp-1: 0.25rem;
+  --esp-2: 0.5rem;
+  --esp-3: 0.75rem;
+  --esp-4: 1rem;
+  --esp-5: 1.5rem;
+  --esp-6: 2rem;
+  --esp-7: 3rem;
+
+  /* Radios y sombras */
+  --radio-sm: 0.25rem;
+  --radio-md: 0.5rem;
+  --radio-lg: 0.75rem;
+  --sombra-1: 0 1px 2px rgb(31 42 36 / 0.08), 0 1px 3px rgb(31 42 36 / 0.06);
+  --sombra-2: 0 4px 12px rgb(31 42 36 / 0.1);
+
+  /* Otros */
+  --ancho-max: 72rem;
+  --alto-control: 2.75rem;
+  --foco-grosor: 3px;
+  --foco-separacion: 2px;
+  --borde-grosor: 1px;
+}
+
+/* ==========================================================================
+   2. Reset mínimo y base por etiqueta
+   ========================================================================== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--color-fondo);
+  color: var(--color-texto);
+  font-family: var(--fuente-base);
+  font-size: var(--texto-base);
+  line-height: var(--interlineado);
+}
+
+h1,
+h2,
+h3,
+p,
+dl,
+dd,
+ul,
+fieldset {
+  margin: 0;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--fuente-titulos);
+  line-height: var(--interlineado-titulos);
+}
+
+h2 {
+  color: var(--color-primario);
+  font-size: var(--texto-lg);
+}
+
+h3 {
+  font-size: var(--texto-md);
+}
+
+a {
+  color: var(--color-primario);
+  text-underline-offset: 0.15em;
+}
+
+a:hover {
+  color: var(--color-primario-oscuro);
+}
+
+caption {
+  padding: var(--esp-3);
+  color: var(--color-texto-suave);
+  font-size: var(--texto-sm);
+  font-weight: var(--peso-medio);
+  text-align: start;
+}
+
+legend {
+  padding-inline: var(--esp-2);
+  font-family: var(--fuente-titulos);
+  font-size: var(--texto-md);
+  font-weight: var(--peso-medio);
+}
+
+output {
+  font-weight: var(--peso-fuerte);
+}
+
+dd,
+p {
+  overflow-wrap: anywhere;
+}
+
+/* ==========================================================================
+   3. Layout: salto, cabecera, contenedor, vistas
+   ========================================================================== */
+.enlace-salto {
+  position: absolute;
+  top: var(--esp-2);
+  left: var(--esp-4);
+  z-index: 10;
+  padding: var(--esp-2) var(--esp-4);
+  background: var(--color-superficie);
+  border-radius: var(--radio-sm);
+  font-weight: var(--peso-medio);
+  transform: translateY(-200%);
+}
+
+.enlace-salto:focus {
+  transform: translateY(0);
+}
+
+.cabecera {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--esp-3);
+  padding: var(--esp-4);
+  background: var(--color-primario);
+  border-bottom: 4px solid var(--color-acento);
+  color: #ffffff;
+}
+
+.cabecera h1 {
+  font-size: var(--texto-2xl);
+}
+
+.nav-principal ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--esp-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.nav-principal a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--alto-control);
+  padding: var(--esp-2) var(--esp-4);
+  border: 2px solid #ffffff;
+  border-radius: var(--radio-sm);
+  color: #ffffff;
+  font-weight: var(--peso-medio);
+  text-decoration: none;
+}
+
+.nav-principal a:hover {
+  background: var(--color-superficie);
+  color: var(--color-primario);
+}
+
+.contenedor {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--esp-5);
+  padding: var(--esp-4);
+}
+
+.tarjeta {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--esp-4);
+  padding: var(--esp-4);
+  background: var(--color-superficie);
+  border-radius: var(--radio-lg);
+  box-shadow: var(--sombra-2);
+}
+
+.vista {
+  border-top: 4px solid var(--color-primario);
+  scroll-margin-top: var(--esp-4);
+}
+
+.tarjeta--anidada {
+  margin-top: var(--esp-4);
+  background: var(--color-fondo);
+  border: 2px solid transparent;
+  border-radius: var(--radio-md);
+  box-shadow: none;
+  scroll-margin-top: var(--esp-4);
+}
+
+/* ==========================================================================
+   4. Componentes: catálogo, formularios, botones
+   ========================================================================== */
+.grilla-fichas {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr));
+  gap: var(--esp-4);
+  padding: 0;
+  list-style: none;
+}
+
+.grilla-fichas > li {
+  display: flex;
+  min-width: 0;
+}
+
+.ficha {
+  display: grid;
+  flex: 1;
+  align-content: start;
+  gap: var(--esp-3);
+  min-width: 0;
+  padding: var(--esp-4);
+  background: var(--color-fondo);
+  border-top: 4px solid var(--color-acento);
+  border-radius: var(--radio-md);
+  box-shadow: var(--sombra-1);
+}
+
+.lista-datos {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: var(--esp-1) var(--esp-3);
+}
+
+.lista-datos dt {
+  color: var(--color-texto-suave);
+  font-size: var(--texto-sm);
+  font-weight: var(--peso-medio);
+}
+
+.lista-datos dd {
+  overflow-wrap: anywhere;
+}
+
+.formulario {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--esp-4);
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-1);
+  min-width: 0;
+}
+
+.buscador {
+  max-width: 32rem;
+}
+
+.campo-etiqueta {
+  font-weight: var(--peso-medio);
+}
+
+.campo-control {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  min-height: var(--alto-control);
+  padding: var(--esp-2) var(--esp-3);
+  background: var(--color-superficie);
+  border: var(--borde-grosor) solid var(--color-borde);
+  border-radius: var(--radio-sm);
+  color: var(--color-texto);
+  font-family: inherit;
+  font-size: 1rem;
+}
+
+/* Campo de cantidad dentro de un renglón de la tabla de venta. */
+.campo-control--compacto {
+  width: 5.5rem;
+}
+
+.campo-control[aria-invalid="true"] {
+  border: 2px dashed var(--color-error);
+}
+
+select[multiple].campo-control {
+  min-height: 0;
+  height: auto;
+}
+
+.campo-control:user-invalid {
+  border: 2px dashed var(--color-error);
+}
+
+.campo-ayuda {
+  color: var(--color-texto-suave);
+  font-size: var(--texto-sm);
+}
+
+.grupo-campos {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--esp-4);
+  min-width: 0;
+  padding: var(--esp-4);
+  border: var(--borde-grosor) solid var(--color-borde);
+  border-radius: var(--radio-md);
+}
+
+.resumen-total {
+  padding: var(--esp-3) var(--esp-4);
+  background: var(--color-primario-claro);
+  border-radius: var(--radio-md);
+  font-size: var(--texto-md);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  justify-self: start;
+  min-height: var(--alto-control);
+  padding: var(--esp-2) var(--esp-5);
+  border: 2px solid transparent;
+  border-radius: var(--radio-sm);
+  font-family: inherit;
+  font-size: var(--texto-base);
+  font-weight: var(--peso-medio);
+  line-height: var(--interlineado);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.btn--primario {
+  background: var(--color-primario);
+  border-color: var(--color-primario);
+  color: #ffffff;
+}
+
+.btn--primario:hover {
+  background: var(--color-primario-oscuro);
+  border-color: var(--color-primario-oscuro);
+}
+
+.btn--secundario {
+  background: var(--color-primario-claro);
+  border-color: var(--color-primario);
+  color: var(--color-primario);
+}
+
+.btn--secundario:hover {
+  background: var(--color-superficie);
+}
+
+.btn--peligro {
+  background: var(--color-error-fondo);
+  border-color: var(--color-error);
+  color: var(--color-error);
+}
+
+.btn--peligro:hover {
+  background: var(--color-error);
+  color: #ffffff;
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn:disabled {
+  background: var(--color-fondo);
+  border: 2px dashed var(--color-borde);
+  color: var(--color-texto-suave);
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ==========================================================================
+   5. Tablas (cada tabla vive en un .tabla-scroll con scroll propio)
+   ========================================================================== */
+.tabla-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+  background: var(--color-superficie);
+  border: var(--borde-grosor) solid var(--color-borde);
+  border-radius: var(--radio-md);
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tabla th,
+.tabla td {
+  padding: var(--esp-2) var(--esp-3);
+  text-align: start;
+}
+
+.tabla th {
+  background: var(--color-primario-claro);
+  border-bottom: 2px solid var(--color-primario);
+  white-space: nowrap;
+}
+
+.tabla td {
+  border-top: var(--borde-grosor) solid var(--color-borde);
+}
+
+.tabla tbody tr:nth-child(even) {
+  background: var(--color-fondo);
+}
+
+/* ==========================================================================
+   6. Mensajes: no dependen solo del color (texto + ícono + estilo de borde)
+      Sin propiedad display: el atributo hidden debe seguir funcionando.
+   ========================================================================== */
+.mensaje,
+.mensaje-vacio,
+.aviso-maqueta {
+  padding: var(--esp-3) var(--esp-4);
+  border: var(--borde-grosor) solid var(--color-borde);
+  border-left-width: 6px;
+  border-radius: var(--radio-md);
+  background: var(--color-superficie);
+  color: var(--color-texto);
+}
+
+.aviso-maqueta {
+  background: var(--color-aviso-fondo);
+  border: 2px dashed var(--color-aviso-borde);
+  border-left-width: 6px;
+  color: var(--color-aviso);
+}
+
+.aviso-maqueta::before {
+  content: "⚠ ";
+  content: "⚠ " / "";
+}
+
+.mensaje-vacio {
+  background: var(--color-info-fondo);
+  border: var(--borde-grosor) dotted var(--color-info-borde);
+  border-left: 6px solid var(--color-info-borde);
+}
+
+.mensaje-vacio::before {
+  content: "ℹ ";
+  content: "ℹ " / "";
+}
+
+/* Varios errores llegan separados por salto de línea: se muestran uno por renglón. */
+.mensaje-resultado {
+  white-space: pre-line;
+}
+
+.mensaje--error {
+  background: var(--color-error-fondo);
+  border: 2px solid var(--color-error);
+  border-left-width: 6px;
+  color: var(--color-error);
+}
+
+.mensaje--error::before {
+  content: "✖ Error: ";
+  content: "✖ Error: " / "Error: ";
+  font-weight: var(--peso-fuerte);
+}
+
+.mensaje--ok {
+  background: var(--color-ok-fondo);
+  border: var(--borde-grosor) solid var(--color-ok);
+  border-left: 6px double var(--color-ok);
+  color: var(--color-ok);
+}
+
+.mensaje--ok::before {
+  content: "✔ Listo: ";
+  content: "✔ Listo: " / "Listo: ";
+  font-weight: var(--peso-fuerte);
+}
+
+/* Estado de carga (se pide a la API): texto + ícono + borde punteado, sin depender del color. */
+.mensaje--cargando {
+  background: var(--color-info-fondo);
+  border: var(--borde-grosor) dashed var(--color-info-borde);
+  border-left: 6px solid var(--color-info-borde);
+}
+
+.mensaje--cargando::before {
+  content: "↻ Cargando: ";
+  content: "↻ Cargando: " / "Cargando: ";
+  font-weight: var(--peso-fuerte);
+}
+
+/* Contenedor de estados con texto y botón «Reintentar» opcional. */
+.mensaje-estado .btn {
+  margin-inline-start: var(--esp-3);
+  vertical-align: middle;
+}
+
+/* ==========================================================================
+   6 bis. Paginación y lista de autores del formulario de libros
+   ========================================================================== */
+.paginacion {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--esp-3);
+}
+
+.paginacion-pagina {
+  font-weight: var(--peso-medio);
+}
+
+/* Dentro del bloque de autores, ayudas, mensajes y la lista ocupan todo el ancho. */
+.grupo-autores > .campo--completo {
+  grid-column: 1 / -1;
+}
+
+.lista-autores {
+  display: grid;
+  gap: var(--esp-2);
+  margin: 0;
+  padding-inline-start: var(--esp-5);
+}
+
+.lista-autores li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--esp-2) var(--esp-3);
+  overflow-wrap: anywhere;
+}
+
+/* ==========================================================================
+   7. Foco visible (nunca se anula el contorno)
+   ========================================================================== */
+:focus-visible {
+  outline: var(--foco-grosor) solid var(--color-foco);
+  outline-offset: var(--foco-separacion);
+}
+
+.cabecera :focus-visible,
+.enlace-salto:focus-visible {
+  outline-color: var(--color-foco-sobre-oscuro);
+}
+
+.tabla-scroll:focus-visible {
+  outline-offset: calc(var(--foco-grosor) * -1);
+}
+
+.campo-control:focus-visible {
+  border-color: var(--color-foco);
+}
+
+#detalle-venta:target {
+  border-color: var(--color-acento);
+  box-shadow: var(--sombra-2);
+}
+
+/* ==========================================================================
+   8. Media queries (mobile-first)
+   ========================================================================== */
+@media (min-width: 40em) {
+  .tarjeta {
+    padding: var(--esp-6);
+  }
+
+  .tarjeta--anidada {
+    padding: var(--esp-5);
+  }
+
+  .formulario--columnas {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .formulario--columnas .campo--completo,
+  .formulario--columnas > .btn {
+    grid-column: 1 / -1;
+  }
+
+  .grupo-campos {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .grupo-campos > .btn {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (min-width: 64em) {
+  .cabecera {
+    flex-direction: row;
+    align-items: center;
+    padding: var(--esp-4) var(--esp-6);
+  }
+
+  .contenedor {
+    width: 100%;
+    max-width: var(--ancho-max);
+    margin-inline: auto;
+  }
+
+  h2 {
+    font-size: var(--texto-xl);
+  }
+
+  .grupo-campos {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: end;
+  }
+
+  .grupo-campos > .btn {
+    grid-column: auto;
+  }
+}
+
+/* Bloque de autores del formulario de libros: Verificar junto al ID y Agregar junto al rol. */
+@media (min-width: 40em) {
+  .grupo-autores > .btn {
+    grid-column: auto;
+    align-self: end;
+  }
+}
+
+@media (min-width: 64em) {
+  .grupo-autores {
+    grid-template-columns: minmax(0, 2fr) auto minmax(0, 1.5fr) auto;
+  }
+}

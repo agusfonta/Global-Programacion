@@ -1,0 +1,49 @@
+@host = http://localhost:8000
+
+### C-04a · Editorial inexistente
+# Esperado: 409 {"detail": "La editorial, el género o algún autor indicado no existe"}
+POST {{host}}/libros/
+Content-Type: application/json
+
+{
+  "isbn": "978-950-00-0100-1",
+  "titulo": "Libro con editorial inexistente",
+  "precio": "12000.00",
+  "stock": 2,
+  "editorial_id": 999,
+  "genero_id": 1,
+  "autores": [{ "autor_id": 1, "rol": "autor", "orden": 1 }]
+}
+
+### C-04b · Autor inexistente
+# Esperado: 409 con el mismo mensaje propio
+POST {{host}}/libros/
+Content-Type: application/json
+
+{
+  "isbn": "978-950-00-0100-2",
+  "titulo": "Libro con autor inexistente",
+  "precio": "12000.00",
+  "stock": 2,
+  "editorial_id": 1,
+  "genero_id": 1,
+  "autores": [{ "autor_id": 999, "rol": "autor", "orden": 1 }]
+}
+
+### C-04 (contraste) · Ejemplo de la consigna, todo válido
+# Esperado: 201 con editorial, género y los dos autores (orden 1 y 2)
+POST {{host}}/libros/
+Content-Type: application/json
+
+{
+  "isbn": "978-950-00-0006-6",
+  "titulo": "Los que aman, odian",
+  "precio": "21000.00",
+  "stock": 4,
+  "editorial_id": 1,
+  "genero_id": 1,
+  "autores": [
+    { "autor_id": 3, "rol": "coautor", "orden": 1 },
+    { "autor_id": 4, "rol": "coautor", "orden": 2 }
+  ]
+}

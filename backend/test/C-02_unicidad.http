@@ -1,0 +1,26 @@
+@host = http://localhost:8000
+
+### C-02a · ISBN repetido (el ISBN 978-950-00-0001-1 ya es de "Rayuela")
+# Esperado: 409 {"detail": "Ya existe un libro con ese ISBN"}
+POST {{host}}/libros/
+Content-Type: application/json
+
+{
+  "isbn": "978-950-00-0001-1",
+  "titulo": "Otro libro",
+  "precio": "10000.00",
+  "stock": 3,
+  "editorial_id": 1,
+  "genero_id": 1,
+  "autores": [{ "autor_id": 1, "rol": "autor", "orden": 1 }]
+}
+
+### C-02b · Email repetido (lucia@example.com ya existe)
+# Esperado: 409 {"detail": "Ya existe un cliente con ese email"}
+POST {{host}}/clientes/
+Content-Type: application/json
+
+{
+  "nombre": "Otra Lucía",
+  "email": "lucia@example.com"
+}

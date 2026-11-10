@@ -1,0 +1,44 @@
+@host = http://localhost:8000
+
+### C-05a · Libro inexistente
+# Esperado: 409 {"detail": "Los libros [999] no existen"}
+POST {{host}}/ventas/
+Content-Type: application/json
+
+{
+  "cliente_id": 2,
+  "renglones": [{ "libro_id": 999, "cantidad": 1 }]
+}
+
+### C-05b · Cliente inexistente
+# Esperado: 409 {"detail": "El cliente indicado no existe"}
+POST {{host}}/ventas/
+Content-Type: application/json
+
+{
+  "cliente_id": 999,
+  "renglones": [{ "libro_id": 1, "cantidad": 1 }]
+}
+
+### C-05c · Contrato (RN-05): sin renglones
+# Esperado: 422
+POST {{host}}/ventas/
+Content-Type: application/json
+
+{
+  "cliente_id": 2,
+  "renglones": []
+}
+
+### C-05d · Contrato (RN-05): libro repetido
+# Esperado: 422
+POST {{host}}/ventas/
+Content-Type: application/json
+
+{
+  "cliente_id": 2,
+  "renglones": [
+    { "libro_id": 1, "cantidad": 1 },
+    { "libro_id": 1, "cantidad": 2 }
+  ]
+}

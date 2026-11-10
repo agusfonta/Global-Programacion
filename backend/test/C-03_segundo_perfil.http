@@ -1,0 +1,21 @@
+@host = http://localhost:8000
+
+### C-03 · Segundo perfil para el mismo cliente (el cliente 1 ya tiene perfil)
+# Esperado: 409 {"detail": "El cliente ya tiene un perfil"}
+POST {{host}}/clientes/1/perfil
+Content-Type: application/json
+
+{
+  "telefono": "11-5555-9999",
+  "direccion": "Otra calle 123"
+}
+
+### C-03 (contraste) · Primer perfil del cliente 2
+# Esperado: 201 con el perfil creado (si se repite: 409)
+POST {{host}}/clientes/2/perfil
+Content-Type: application/json
+
+{
+  "telefono": "11-5555-0002",
+  "direccion": "Calle Falsa 742"
+}

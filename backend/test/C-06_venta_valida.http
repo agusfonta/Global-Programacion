@@ -1,0 +1,16 @@
+@host = http://localhost:8000
+
+### C-06 · Venta válida con dos renglones
+# Esperado: 201, total "77000.00" y renglones con el precio
+# copiado del libro: Rayuela 25000.00 x2 (subtotal 50000.00) y Respiración artificial 27000.00 x1.
+# En la consola, unos 0,5 s después de la respuesta: "Comprobante de la venta N enviado".
+POST {{host}}/ventas/
+Content-Type: application/json
+
+{
+  "cliente_id": 2,
+  "renglones": [
+    { "libro_id": 1, "cantidad": 2 },
+    { "libro_id": 4, "cantidad": 1 }
+  ]
+}

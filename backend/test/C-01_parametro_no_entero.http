@@ -1,0 +1,5 @@
+@host = http://localhost:8000
+
+### C-01 · Parámetro de ruta que no es entero
+# Esperado: 422 (FastAPI rechaza antes de ejecutar el handler)
+GET {{host}}/editoriales/abc

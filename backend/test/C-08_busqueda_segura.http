@@ -1,0 +1,13 @@
+@host = http://localhost:8000
+
+### C-08 · Búsqueda por título con el texto ' OR '1'='1
+# Esperado: 200 con lista vacía (el texto viaja como parámetro ligado, no se interpreta como SQL)
+GET {{host}}/libros/?titulo=' OR '1'='1
+
+### C-08 (contraste) · Búsqueda legítima, sin distinguir mayúsculas
+# Esperado: 200 con "Rayuela"
+GET {{host}}/libros/?titulo=rayu
+
+### Paginación fuera de rango
+# Esperado: 422
+GET {{host}}/libros/?limit=0

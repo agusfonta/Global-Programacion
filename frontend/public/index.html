@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Librería Pampa</title>
+  <link rel="stylesheet" href="css/estilos.css">
+  <script src="js/app.js" defer></script>
+</head>
+<body>
+  <a class="enlace-salto" href="#contenido">Saltar al contenido principal</a>
+
+  <header class="cabecera">
+    <h1>Librería Pampa</h1>
+    <nav class="nav-principal" aria-label="Principal">
+      <ul>
+        <li><a href="#catalogo">Catálogo</a></li>
+        <li><a href="#libros">Libros</a></li>
+        <li><a href="#clientes">Clientes</a></li>
+        <li><a href="#ventas">Ventas</a></li>
+        <li><a href="#historial">Historial</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="contenedor" id="contenido" tabindex="-1">
+
+    <!-- Vista: Catálogo -->
+    <section class="vista tarjeta" id="catalogo" aria-labelledby="titulo-catalogo">
+      <h2 id="titulo-catalogo" tabindex="-1">Catálogo</h2>
+      <p>Librería Pampa: libros disponibles.</p>
+
+      <div class="campo buscador">
+        <label class="campo-etiqueta" for="busqueda-titulo">Buscar libros por título</label>
+        <input class="campo-control" type="search" id="busqueda-titulo" name="titulo" aria-describedby="ayuda-busqueda-titulo">
+        <p class="campo-ayuda" id="ayuda-busqueda-titulo">La búsqueda es parcial y distingue las tildes (por ejemplo, «Cortazar» no encuentra «Cortázar»).</p>
+      </div>
+
+      <div class="mensaje mensaje-estado" id="estado-catalogo-cargando" role="status" aria-live="polite" hidden>
+        <span class="mensaje-estado-texto"></span>
+      </div>
+      <div class="mensaje mensaje-estado" id="estado-catalogo-error" role="status" aria-live="polite" hidden>
+        <span class="mensaje-estado-texto"></span>
+        <button class="btn btn--secundario" type="button" hidden>Reintentar</button>
+      </div>
+      <p class="mensaje-vacio" id="mensaje-catalogo-vacio" role="status" aria-live="polite" hidden></p>
+      <p class="mensaje-vacio" id="mensaje-catalogo-sin-resultados" role="status" aria-live="polite" hidden></p>
+
+      <ul class="grilla-fichas" id="lista-catalogo"></ul>
+
+      <nav class="paginacion" aria-label="Paginación del catálogo">
+        <button class="btn btn--secundario" type="button" id="catalogo-anterior" disabled>Anterior</button>
+        <span class="paginacion-pagina" id="catalogo-pagina">Página 1</span>
+        <button class="btn btn--secundario" type="button" id="catalogo-siguiente" disabled>Siguiente</button>
+      </nav>
+    </section>
+
+    <!-- Vista: Libros -->
+    <section class="vista tarjeta" id="libros" aria-labelledby="titulo-libros">
+      <h2 id="titulo-libros">Libros</h2>
+
+      <div class="mensaje mensaje-estado" id="estado-opciones-libro" role="status" aria-live="polite" hidden>
+        <span class="mensaje-estado-texto"></span>
+        <button class="btn btn--secundario" type="button" hidden>Reintentar</button>
+      </div>
+
+      <form class="formulario formulario--columnas" id="form-libro" novalidate>
+        <div class="campo">
+          <label class="campo-etiqueta" for="libro-titulo">Título</label>
+          <input class="campo-control" type="text" id="libro-titulo" name="titulo" required>
+        </div>
+        <div class="campo">
+          <label class="campo-etiqueta" for="libro-isbn">ISBN</label>
+          <input class="campo-control" type="text" id="libro-isbn" name="isbn" required>
+        </div>
+        <div class="campo">
+          <label class="campo-etiqueta" for="libro-precio">Precio (en pesos, hasta 2 decimales)</label>
+          <input class="campo-control" type="number" id="libro-precio" name="precio" min="0.01" step="0.01" required>
+        </div>
+        <div class="campo">
+          <label class="campo-etiqueta" for="libro-stock">Stock (unidades)</label>
+          <input class="campo-control" type="number" id="libro-stock" name="stock" min="0" step="1" value="0" required>
+        </div>
+        <div class="campo">
+          <label class="campo-etiqueta" for="libro-editorial">Editorial</label>
+          <select class="campo-control" id="libro-editorial" name="editorial" required>
+            <option value="">Seleccioná una editorial</option>
+          </select>
+        </div>
+        <div class="campo">
+          <label class="campo-etiqueta" for="libro-genero">Género (opcional)</label>
+          <select class="campo-control" id="libro-genero" name="genero">
+            <option value="">Sin género</option>
+          </select>
+        </div>
+
+        <fieldset class="campo--completo grupo-campos grupo-autores">
+          <legend>Autores del libro (al menos uno)</legend>
+          <div class="campo">
+            <label class="campo-etiqueta" for="libro-autor-id">ID de autor</label>
+            <input class="campo-control" type="number" id="libro-autor-id" min="1" step="1" inputmode="numeric" aria-describedby="ayuda-libro-autores">
+          </div>
+          <button class="btn btn--secundario" type="button" id="btn-verificar-autor">Verificar</button>
+          <div class="campo">
+            <label class="campo-etiqueta" for="libro-autor-rol">Rol</label>
+            <select class="campo-control" id="libro-autor-rol">
+              <option value="autor">autor</option>
+              <option value="coautor">coautor</option>
+              <option value="traductor">traductor</option>
+              <option value="ilustrador">ilustrador</option>
+            </select>
+          </div>
+          <button class="btn btn--secundario" type="button" id="btn-agregar-autor" disabled>Agregar autor</button>
+          <p class="campo-ayuda campo--completo" id="ayuda-libro-autores">Ingresá el ID, verificalo para ver el nombre y la nacionalidad, y recién ahí agregalo. El orden de los autores es el de esta lista.</p>
+          <div class="mensaje mensaje-resultado campo--completo" id="autor-verificado" role="status" aria-live="polite" hidden></div>
+          <ol class="lista-autores campo--completo" id="lista-autores-libro" aria-label="Autores agregados"></ol>
+          <p class="mensaje-vacio campo--completo" id="mensaje-autores-vacio">Todavía no agregaste autores.</p>
+        </fieldset>
+
+        <button class="btn btn--primario" type="submit">Registrar libro</button>
+      </form>
+
+      <div class="mensaje mensaje-resultado" id="mensaje-libro-resultado" role="status" aria-live="polite" hidden></div>
+
+      <div class="mensaje mensaje-estado" id="estado-libros" role="status" aria-live="polite" hidden>
+        <span class="mensaje-estado-texto"></span>
+        <button class="btn btn--secundario" type="button" hidden>Reintentar</button>
+      </div>
+
+      <div class="tabla-scroll" tabindex="0" role="region" aria-label="Tabla de libros registrados">
+        <table class="tabla">
+          <caption>Libros registrados</caption>
+          <thead>
+            <tr>
+              <th scope="col">ID</th>
+              <th scope="col">Título</th>
+              <th scope="col">ISBN</th>
+              <th scope="col">Editorial</th>
+              <th scope="col">Género</th>
+              <th scope="col">Precio</th>
+              <th scope="col">Stock</th>
+            </tr>
+          </thead>
+          <tbody id="tabla-libros-cuerpo"></tbody>
+        </table>
+      </div>
+      <p class="mensaje-vacio" id="mensaje-libros-vacio" role="status" aria-live="polite" hidden></p>
+      <p class="campo-ayuda" id="nota-libros-limite" hidden></p>
+    </section>
+
+    <!-- Vista: Clientes -->
+    <section class="vista tarjeta" id="clientes" aria-labelledby="titulo-clientes">
+      <h2 id="titulo-clientes">Clientes</h2>
+
+      <form class="formulario formulario--columnas" id="form-cliente" novalidate>
+        <div class="campo">
+          <label class="campo-etiqueta" for="cliente-nombre">Nombre completo</label>
+          <input class="campo-control" type="text" id="cliente-nombre" name="nombre" required>
+        </div>
+        <div class="campo">
+          <label class="campo-etiqueta" for="cliente-email">Email</label>
+          <input class="campo-control" type="email" id="cliente-email" name="email" required>
+        </div>
+        <button class="btn btn--primario" type="submit">Registrar cliente</button>
+      </form>
+
+      <div class="mensaje mensaje-resultado" id="mensaje-cliente-resultado" role="status" aria-live="polite" hidden></div>
+
+      <fieldset class="grupo-campos">
+        <legend>Buscar cliente por ID</legend>
+        <div class="campo">
+          <label class="campo-etiqueta" for="buscar-cliente-id">ID de cliente</label>
+          <input class="campo-control" type="number" id="buscar-cliente-id" min="1" step="1" inputmode="numeric">
+        </div>
+        <button class="btn btn--secundario" type="button" id="btn-buscar-cliente">Buscar cliente</button>
+      </fieldset>
+      <div class="mensaje mensaje-resultado" id="resultado-buscar-cliente" role="status" aria-live="polite" hidden></div>
+
+      <div class="mensaje mensaje-estado" id="estado-clientes" role="status" aria-live="polite" hidden>
+        <span class="mensaje-estado-texto"></span>
+        <button class="btn btn--secundario" type="button" hidden>Reintentar</button>
+      </div>
+
+      <div class="tabla-scroll" tabindex="0" role="region" aria-label="Tabla de clientes registrados">
+        <table class="tabla">
+          <caption>Clientes registrados</caption>
+          <thead>
+            <tr>
+              <th scope="col">ID</th>
+              <th scope="col">Nombre completo</th>
+              <th scope="col">Email</th>
+            </tr>
+          </thead>
+          <tbody id="tabla-clientes-cuerpo"></tbody>
+        </table>
+      </div>
+      <p class="mensaje-vacio" id="mensaje-clientes-vacio" role="status" aria-live="polite" hidden></p>
+      <p class="campo-ayuda" id="nota-clientes-limite" hidden></p>
+    </section>
+
+    <!-- Vista: Ventas -->
+    <section class="vista tarjeta" id="ventas" aria-labelledby="titulo-ventas">
+      <h2 id="titulo-ventas">Ventas</h2>
+
+      <form class="formulario" id="form-venta" novalidate>
+        <div class="campo">
+          <label class="campo-etiqueta" for="venta-cliente">Cliente</label>
+          <select class="campo-control" id="venta-cliente" name="cliente">
+            <option value="">Seleccioná un cliente</option>
+          </select>
+        </div>
+
+        <fieldset class="grupo-campos">
+          <legend>Agregar un libro a la venta</legend>
+          <div class="campo">
+            <label class="campo-etiqueta" for="venta-libro">Libro</label>
+            <select class="campo-control" id="venta-libro" name="libro">
+              <option value="">Seleccioná un libro</option>
+            </select>
+          </div>
+          <div class="campo">
+            <label class="campo-etiqueta" for="venta-cantidad">Cantidad</label>
+            <input class="campo-control" type="number" id="venta-cantidad" name="cantidad" min="1" step="1" value="1">
+          </div>
+          <button class="btn btn--secundario" type="button" id="btn-agregar-renglon">Agregar renglón</button>
+        </fieldset>
+
+        <div class="tabla-scroll" tabindex="0" role="region" aria-label="Tabla de renglones de la venta">
+          <table class="tabla">
+            <caption>Renglones de la venta (borrador)</caption>
+            <thead>
+              <tr>
+                <th scope="col">Libro</th>
+                <th scope="col">Cantidad</th>
+                <th scope="col">Precio unitario</th>
+                <th scope="col">Subtotal estimado</th>
+                <th scope="col">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="venta-renglones-cuerpo"></tbody>
+          </table>
+        </div>
+        <p class="mensaje-vacio" id="mensaje-venta-vacia">La venta no tiene renglones. Agregá al menos un libro.</p>
+
+        <p class="resumen-total">Total estimado del borrador: <output id="venta-total" name="total">$ 0,00</output></p>
+        <p class="campo-ayuda">El total y los precios definitivos los calcula el servidor al confirmar la venta.</p>
+
+        <button class="btn btn--primario" type="submit">Confirmar venta</button>
+      </form>
+
+      <div class="mensaje mensaje-resultado" id="mensaje-venta-resultado" role="status" aria-live="polite" hidden></div>
+
+      <article class="tarjeta tarjeta--anidada" id="venta-comprobante" aria-labelledby="titulo-venta-comprobante" hidden>
+        <h3 id="titulo-venta-comprobante" tabindex="-1">Comprobante de la venta</h3>
+        <div id="venta-comprobante-contenido"></div>
+      </article>
+    </section>
+
+    <!-- Vista: Historial -->
+    <section class="vista tarjeta" id="historial" aria-labelledby="titulo-historial">
+      <h2 id="titulo-historial" tabindex="-1">Historial</h2>
+      <p class="campo-ayuda">Las ventas se muestran ordenadas por identificador ascendente: primero las más antiguas. Las ventas nuevas aparecen en la última página.</p>
+
+      <div class="mensaje mensaje-estado" id="estado-historial" role="status" aria-live="polite" hidden>
+        <span class="mensaje-estado-texto"></span>
+        <button class="btn btn--secundario" type="button" hidden>Reintentar</button>
+      </div>
+
+      <div class="tabla-scroll" tabindex="0" role="region" aria-label="Tabla de ventas realizadas">
+        <table class="tabla">
+          <caption>Ventas realizadas</caption>
+          <thead>
+            <tr>
+              <th scope="col">Identificador</th>
+              <th scope="col">Fecha</th>
+              <th scope="col">Cliente</th>
+              <th scope="col">Total</th>
+              <th scope="col">Detalle</th>
+            </tr>
+          </thead>
+          <tbody id="historial-cuerpo"></tbody>
+        </table>
+      </div>
+      <p class="mensaje-vacio" id="mensaje-historial-vacio" role="status" aria-live="polite" hidden></p>
+
+      <nav class="paginacion" aria-label="Paginación del historial">
+        <button class="btn btn--secundario" type="button" id="historial-anterior" disabled>Anterior</button>
+        <span class="paginacion-pagina" id="historial-pagina">Página 1</span>
+        <button class="btn btn--secundario" type="button" id="historial-siguiente" disabled>Siguiente</button>
+      </nav>
+
+      <div class="mensaje mensaje-estado" id="estado-detalle-venta" role="status" aria-live="polite" hidden>
+        <span class="mensaje-estado-texto"></span>
+        <button class="btn btn--secundario" type="button" hidden>Reintentar</button>
+      </div>
+
+      <article class="tarjeta tarjeta--anidada" id="detalle-venta" aria-labelledby="titulo-detalle-venta" hidden>
+        <h3 id="titulo-detalle-venta" tabindex="-1">Detalle de la venta</h3>
+        <div id="detalle-venta-contenido"></div>
+      </article>
+    </section>
+
+  </main>
+</body>
+</html>
