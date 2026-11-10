@@ -3,6 +3,11 @@
 Imagen del TP congelado (Cap. 1-4) para correr en un contenedor. Todos los comandos se ejecutan
 desde esta carpeta (`despliegue/`). Sin Docker Compose.
 
+> **Nota:** el despliegue vigente del Global (dos servicios App en Easypanel: `backend-libreria` y
+> `frontend-libreria`, con la base `db-libreria`) está en el [DEPLOY.md](../DEPLOY.md) de la raíz.
+> Esta sección documenta el despliegue previo como contenedor suelto. El host interno de la base
+> del Global es `grupo1-chicas_db-libreria:5432`.
+
 ## Despliegue en el VPS (Ej. 10)
 
 - **URL pública**: http://187.127.58.90:8101 (por ejemplo `/health/ready`, `/libros/`, `/docs`).
@@ -28,13 +33,13 @@ desde esta carpeta (`despliegue/`). Sin Docker Compose.
   `alembic_version` no choquen.
 - **Red y host de la base**: la base no publica el puerto 5432 en el servidor, así que
   `host.docker.internal` no llega a ella. El contenedor se une a la red de Docker del grupo
-  (`easypanel-grupo1-chicas`, `attachable`) y usa el host `grupo1-chicas-db`.
+  (`easypanel-grupo1-chicas`, `attachable`) y usa el host `grupo1-chicas_db-libreria`.
 - **Archivo de variables**: `/root/libreria/libreria.env` (permisos 600, fuera del contexto de
   build, de la imagen y del repositorio). Su contenido tiene esta forma (la contraseña no se
   muestra en ningún lado):
 
   ```
-  DATABASE_URL=postgresql+asyncpg://libreria:<password>@grupo1-chicas-db:5432/libreria
+  DATABASE_URL=postgresql+asyncpg://libreria:<password>@grupo1-chicas_db-libreria:5432/libreria
   SQL_ECHO=false
   ```
 

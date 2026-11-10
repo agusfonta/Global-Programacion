@@ -20,7 +20,7 @@ class LibroCreate(SQLModel):
     stock: int = Field(ge=0)
     editorial_id: int
     genero_id: int | None = None
-    autores: list[LibroAutorCreate] = Field(default_factory=list)
+    autores: list[LibroAutorCreate] = Field(min_length=1)
 
     @model_validator(mode="after")
     def _autores_sin_repetir(self) -> "LibroCreate":

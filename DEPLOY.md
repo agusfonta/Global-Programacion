@@ -103,10 +103,6 @@ ejecutarlo** sobre esta base: borraría las ventas y los registros creados despu
 
 ## Verificación en la URL pública
 
-Registrar acá lo observado (con datos ficticios), y guardar capturas en [evidencia/](evidencia/):
-
-| Verificación | Resultado |
-|---|---|
 Ejecutado el 2026-11-10 sobre `https://libreria.agusfontagnol.me`. Registro completo en
 [evidencia/pruebas-G01-G06-url-publica.md](evidencia/pruebas-G01-G06-url-publica.md)
 (19 verificaciones, todas correctas) y capturas

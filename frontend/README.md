@@ -7,6 +7,7 @@ Trabajo práctico integrador de **Programación III** (Tecnicatura Universitaria
 - Gianella Peña
 - Agustina Fontagnol
 - Martina Suarez
+- Yoselie Aquino
 
 ## Estructura
 
