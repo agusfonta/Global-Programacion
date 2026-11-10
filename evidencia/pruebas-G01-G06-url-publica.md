@@ -1,7 +1,7 @@
 # Evidencia de pruebas G-01 a G-06
 
-- Ejecutado: 2026-11-10 12:32 (hora local)
-- Origen probado: `https://grupo1-chicas-frontend-libreria.ugpvou.easypanel.host` (URL pública HTTPS en Easypanel: frontend Nginx -> proxy `/api/` -> backend FastAPI -> PostgreSQL)
+- Ejecutado: 2026-11-10 12:55 (hora local)
+- Origen probado: `https://libreria.agusfontagnol.me` (HTTPS: frontend Nginx -> proxy `/api/` -> backend FastAPI -> PostgreSQL)
 - Datos: ficticios (seed del backend + los creados en estos casos)
 - Las respuestas son las devueltas por la API en la ejecución; no están editadas.
 
@@ -69,6 +69,10 @@ HTTP **200** ✅
   {
     "id": 5,
     "titulo": "Bestiario"
+  },
+  {
+    "id": 6,
+    "titulo": "Libro Global"
   }
 ]
 ```
@@ -121,15 +125,15 @@ HTTP **200** ✅
 
 **Alta con stock, sin género y con dos autorías**
 
-`POST /libros/` con cuerpo `{"titulo": "Libro Global", "isbn": "978-999-00-0001-9", "precio": "12345.50", "stock": 7, "editorial_id": 1, "genero_id": null, "autores": [{"autor_id": 1, "rol": "autor", "orden": 1}, {"autor_id": 2, "rol": "traductor", "orden": 2}]}`
+`POST /libros/` con cuerpo `{"titulo": "Libro Demo Dominio", "isbn": "978-999-00-0002-6", "precio": "12345.50", "stock": 7, "editorial_id": 1, "genero_id": null, "autores": [{"autor_id": 1, "rol": "autor", "orden": 1}, {"autor_id": 2, "rol": "traductor", "orden": 2}]}`
 
 HTTP **201** ✅
 
 ```json
 {
-  "id": 6,
-  "isbn": "978-999-00-0001-9",
-  "titulo": "Libro Global",
+  "id": 9,
+  "isbn": "978-999-00-0002-6",
+  "titulo": "Libro Demo Dominio",
   "precio": "12345.50",
   "stock": 7,
   "editorial": {
@@ -163,15 +167,15 @@ HTTP **201** ✅
 
 **Consultar el detalle del libro creado**
 
-`GET /libros/6`
+`GET /libros/9`
 
 HTTP **200** ✅
 
 ```json
 {
-  "id": 6,
-  "isbn": "978-999-00-0001-9",
-  "titulo": "Libro Global",
+  "id": 9,
+  "isbn": "978-999-00-0002-6",
+  "titulo": "Libro Demo Dominio",
   "precio": "12345.50",
   "stock": 7,
   "editorial": {
@@ -205,7 +209,7 @@ HTTP **200** ✅
 
 **Repetir el ISBN**
 
-`POST /libros/` con cuerpo `{"titulo": "Otro", "isbn": "978-999-00-0001-9", "precio": "10", "stock": 1, "editorial_id": 1, "autores": [{"autor_id": 1, "rol": "autor", "orden": 1}]}`
+`POST /libros/` con cuerpo `{"titulo": "Otro", "isbn": "978-999-00-0002-6", "precio": "10", "stock": 1, "editorial_id": 1, "autores": [{"autor_id": 1, "rol": "autor", "orden": 1}]}`
 
 HTTP **409** ✅
 
@@ -220,37 +224,37 @@ HTTP **409** ✅
 
 **Alta de cliente**
 
-`POST /clientes/` con cuerpo `{"nombre": "Cliente Global", "email": "global@example.com"}`
+`POST /clientes/` con cuerpo `{"nombre": "Cliente Demo Dominio", "email": "demo.dominio@example.com"}`
 
 HTTP **201** ✅
 
 ```json
 {
-  "id": 4,
-  "nombre": "Cliente Global",
-  "email": "global@example.com",
+  "id": 6,
+  "nombre": "Cliente Demo Dominio",
+  "email": "demo.dominio@example.com",
   "perfil": null
 }
 ```
 
 **Recuperarlo por ID**
 
-`GET /clientes/4`
+`GET /clientes/6`
 
 HTTP **200** ✅
 
 ```json
 {
-  "id": 4,
-  "nombre": "Cliente Global",
-  "email": "global@example.com",
+  "id": 6,
+  "nombre": "Cliente Demo Dominio",
+  "email": "demo.dominio@example.com",
   "perfil": null
 }
 ```
 
 **Repetir el email**
 
-`POST /clientes/` con cuerpo `{"nombre": "Otro", "email": "global@example.com"}`
+`POST /clientes/` con cuerpo `{"nombre": "Otro", "email": "demo.dominio@example.com"}`
 
 HTTP **409** ✅
 
@@ -265,19 +269,19 @@ HTTP **409** ✅
 
 **Registrar la venta**
 
-`POST /ventas/` con cuerpo `{"cliente_id": 4, "renglones": [{"libro_id": 6, "cantidad": 2}, {"libro_id": 2, "cantidad": 1}]}`
+`POST /ventas/` con cuerpo `{"cliente_id": 6, "renglones": [{"libro_id": 9, "cantidad": 2}, {"libro_id": 2, "cantidad": 1}]}`
 
 HTTP **201** ✅
 
 ```json
 {
-  "id": 2,
-  "fecha": "2026-11-10T15:32:45.710857Z",
+  "id": 4,
+  "fecha": "2026-11-10T15:55:29.973117Z",
   "total": "42691.00",
   "cliente": {
-    "id": 4,
-    "nombre": "Cliente Global",
-    "email": "global@example.com"
+    "id": 6,
+    "nombre": "Cliente Demo Dominio",
+    "email": "demo.dominio@example.com"
   },
   "renglones": [
     {
@@ -288,8 +292,8 @@ HTTP **201** ✅
       "subtotal": "18000.00"
     },
     {
-      "libro_id": 6,
-      "titulo": "Libro Global",
+      "libro_id": 9,
+      "titulo": "Libro Demo Dominio",
       "cantidad": 2,
       "precio_unitario": "12345.50",
       "subtotal": "24691.00"
@@ -300,19 +304,19 @@ HTTP **201** ✅
 
 **Consultar el detalle (equivale a abrirlo tras recargar la página)**
 
-`GET /ventas/2`
+`GET /ventas/4`
 
 HTTP **200** ✅
 
 ```json
 {
-  "id": 2,
-  "fecha": "2026-11-10T15:32:45.710857Z",
+  "id": 4,
+  "fecha": "2026-11-10T15:55:29.973117Z",
   "total": "42691.00",
   "cliente": {
-    "id": 4,
-    "nombre": "Cliente Global",
-    "email": "global@example.com"
+    "id": 6,
+    "nombre": "Cliente Demo Dominio",
+    "email": "demo.dominio@example.com"
   },
   "renglones": [
     {
@@ -323,8 +327,8 @@ HTTP **200** ✅
       "subtotal": "18000.00"
     },
     {
-      "libro_id": 6,
-      "titulo": "Libro Global",
+      "libro_id": 9,
+      "titulo": "Libro Demo Dominio",
       "cantidad": 2,
       "precio_unitario": "12345.50",
       "subtotal": "24691.00"
@@ -340,33 +344,33 @@ Detalle idéntico a la respuesta del alta: **sí**
 
 **Cambiar el precio del libro con PATCH**
 
-`PATCH /libros/6` con cuerpo `{"precio": "99999.00"}`
+`PATCH /libros/9` con cuerpo `{"precio": "99999.00"}`
 
 HTTP **200** ✅
 
 ```json
 {
-  "id": 6,
-  "titulo": "Libro Global",
+  "id": 9,
+  "titulo": "Libro Demo Dominio",
   "precio": "99999.00"
 }
 ```
 
 **Detalle de la venta anterior tras el PATCH**
 
-`GET /ventas/2`
+`GET /ventas/4`
 
 HTTP **200** ✅
 
 ```json
 {
-  "id": 2,
-  "fecha": "2026-11-10T15:32:45.710857Z",
+  "id": 4,
+  "fecha": "2026-11-10T15:55:29.973117Z",
   "total": "42691.00",
   "cliente": {
-    "id": 4,
-    "nombre": "Cliente Global",
-    "email": "global@example.com"
+    "id": 6,
+    "nombre": "Cliente Demo Dominio",
+    "email": "demo.dominio@example.com"
   },
   "renglones": [
     {
@@ -377,8 +381,8 @@ HTTP **200** ✅
       "subtotal": "18000.00"
     },
     {
-      "libro_id": 6,
-      "titulo": "Libro Global",
+      "libro_id": 9,
+      "titulo": "Libro Demo Dominio",
       "cantidad": 2,
       "precio_unitario": "12345.50",
       "subtotal": "24691.00"
@@ -433,6 +437,6 @@ HTTP **422** ✅
 ]
 ```
 
-Historial antes de los rechazos: [(1, '18000.00'), (2, '42691.00')]  
-Historial después de los rechazos: [(1, '18000.00'), (2, '42691.00')]  
+Historial antes de los rechazos: [(1, '18000.00'), (2, '42691.00'), (4, '42691.00')]  
+Historial después de los rechazos: [(1, '18000.00'), (2, '42691.00'), (4, '42691.00')]  
 Historial sin cambios: **sí**

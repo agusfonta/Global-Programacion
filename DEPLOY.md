@@ -8,10 +8,10 @@ desplegar; no se inventan valores.
 
 | Dato | Valor |
 |---|---|
-| URL pública (frontend) | https://grupo1-chicas-frontend-libreria.ugpvou.easypanel.host |
-| Revisión desplegada (commit) | `8ccb10a` |
+| URL pública (frontend) | https://libreria.agusfontagnol.me |
+| Revisión desplegada (commit) | `cd4c7f3` (rama `main`) |
 | Repositorio / rama | https://github.com/agusfonta/Global-Programacion, rama `main` |
-| Fecha del despliegue | 2026-11-10 (COMPLETAR: hora exacta) |
+| Fecha del último despliegue | 2026-11-10, 13:02:47 (hora de Argentina; 16:02:47 GMT) |
 | Proyecto de Easypanel | `grupo1-chicas` (servicios `backend-libreria`, `frontend-libreria` y `db-libreria`) |
 
 ## Servicios
@@ -65,12 +65,23 @@ Debe imprimir `200`.
 El host interno de PostgreSQL de este despliegue es `grupo1-chicas_db-libreria:5432`, base
 `libreria` (servicio `db-libreria`). La contraseña solo existe en el panel.
 
+## Dominio propio
+
+El dominio `agusfontagnol.me` tiene el DNS en Namecheap, con un registro **A comodín** (`*`) hacia
+la IP del servidor, así que `libreria.agusfontagnol.me` resuelve sin crear registros nuevos. En
+`frontend-libreria` → Dominios se agregó el host `libreria.agusfontagnol.me` con HTTPS
+(Let's Encrypt), protocolo interno HTTP y puerto de destino 80. Al cambiar de dominio **no hace
+falta** modificar el código, el backend ni `API_UPSTREAM`: el frontend pide `/api/...` en
+ruta relativa y Nginx lo reenvía por la red interna.
+
 ## Proxy
 
 Nginx (`frontend/default.conf.template`) sirve los archivos estáticos de `public/` y reenvía
 `/api/` al backend quitando el prefijo: la barra final de `proxy_pass` hace que `/api/libros/`
-llegue a FastAPI como `/libros/`. El navegador habla con un solo origen, por eso el backend no
-necesita CORS. El Dockerfile limita la sustitución de variables a `API_UPSTREAM`
+llegue a FastAPI como `/libros/`. El navegador habla con un solo origen (el dominio del frontend),
+por eso el backend no necesita CORS ni cambios al cambiar de dominio. Comprobado: una petición
+con `Origin: https://libreria.agusfontagnol.me` a `/api/libros/` responde 200 sin cabeceras CORS,
+que no hacen falta. El Dockerfile limita la sustitución de variables a `API_UPSTREAM`
 (`NGINX_ENVSUBST_FILTER`).
 
 ## Carga inicial de datos
@@ -96,7 +107,7 @@ Registrar acá lo observado (con datos ficticios), y guardar capturas en [eviden
 
 | Verificación | Resultado |
 |---|---|
-Ejecutado el 2026-11-10 sobre la URL pública. Registro completo en
+Ejecutado el 2026-11-10 sobre `https://libreria.agusfontagnol.me`. Registro completo en
 [evidencia/pruebas-G01-G06-url-publica.md](evidencia/pruebas-G01-G06-url-publica.md)
 (19 verificaciones, todas correctas) y capturas
 [publica-escritorio-1280.png](evidencia/publica-escritorio-1280.png) y
@@ -112,7 +123,7 @@ Ejecutado el 2026-11-10 sobre la URL pública. Registro completo en
 | G-04 venta con dos renglones y detalle tras recargar | OK (201; detalle idéntico; total 42.691,00) |
 | G-05 `PATCH /libros/{id}` y venta anterior sin cambios | OK (la venta conserva 12.345,50) |
 | G-06 rechazos 409 y 422, historial sin cambios | OK (409, 409 y 422; historial igual) |
-| G-07 datos tras redespliegue | COMPLETAR (redesplegar y comprobar que siguen los datos) |
+| G-07 imagen se construye, HTTPS y datos tras redespliegue | OK: ver [evidencia/G07-redespliegue.md](evidencia/G07-redespliegue.md). Tras redesplegar backend y frontend, salud 200 y los 8 libros, 5 clientes y 3 ventas (con importes) idénticos |
 
 No se guardaron capturas de los mensajes de error en pantalla (409/422 en la interfaz):
 COMPLETAR con capturas manuales desde la URL pública.
@@ -142,5 +153,7 @@ El grupo ya tenía un backend desplegado a mano como contenedor suelto (puerto p
 contra otra base de PostgreSQL. Se dejó funcionando y no se modificó. El servicio App de esta guía
 usa su propia base (`db-libreria`) y no comparte datos con aquel.
 
-El servicio `backend-libreria` no debe tener dominio público: Easypanel crea uno automático y hay
-que borrarlo desde Dominios (el frontend llega al backend por la red interna).
+El servicio `backend-libreria` no tiene dominio público: el que Easypanel crea automáticamente se
+borró desde Dominios y el frontend llega al backend por la red interna. Con el dominio propio ya
+configurado, también se borró el dominio automático del frontend; `https://libreria.agusfontagnol.me`
+es la única URL pública.
