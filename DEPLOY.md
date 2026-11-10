@@ -125,8 +125,20 @@ Ejecutado el 2026-11-10 sobre `https://libreria.agusfontagnol.me`. Registro comp
 | G-06 rechazos 409 y 422, historial sin cambios | OK (409, 409 y 422; historial igual) |
 | G-07 imagen se construye, HTTPS y datos tras redespliegue | OK: ver [evidencia/G07-redespliegue.md](evidencia/G07-redespliegue.md). Tras redesplegar backend y frontend, salud 200 y los 8 libros, 5 clientes y 3 ventas (con importes) idénticos |
 
-No se guardaron capturas de los mensajes de error en pantalla (409/422 en la interfaz):
-COMPLETAR con capturas manuales desde la URL pública.
+Capturas de la interfaz en `https://libreria.agusfontagnol.me` (datos ficticios):
+
+| Captura | Qué muestra |
+|---|---|
+| [error-409-isbn.jpg](evidencia/error-409-isbn.jpg) | G-02: alta de libro con ISBN repetido; error del servidor «Ya existe un libro con ese ISBN» |
+| [error-409-email.jpg](evidencia/error-409-email.jpg) | G-03: alta de cliente con email repetido; error «Ya existe un cliente con ese email» |
+| [error-422-precio.jpg](evidencia/error-422-precio.jpg) | 422 del servidor: precio de 11 cifras (la API admite 10); mensaje «Precio: valor inválido.» y la tabla de libros sin cambios |
+| [venta-renglon-repetido.jpg](evidencia/venta-renglon-repetido.jpg) | G-06: la pantalla rechaza agregar el mismo libro dos veces y conserva el borrador (validación del frontend; el 422 del servidor para este caso está en el registro de pruebas) |
+| [venta-confirmada.jpg](evidencia/venta-confirmada.jpg) | G-04: venta con dos renglones confirmada; precios unitarios, subtotales y total tomados de la respuesta (venta 6, $ 77.000,00) |
+| [venta-detalle-tras-recargar.jpg](evidencia/venta-detalle-tras-recargar.jpg) | G-04: tras recargar la página, el detalle de la venta 6 desde el historial coincide con el comprobante |
+
+Las capturas 5 y 6 se tomaron con el zoom del navegador al 70 % para que entren todas las columnas.
+El 409 de una venta con cliente o libro inexistente no se puede provocar desde la pantalla (los
+selectores solo ofrecen registros que existen): está en el registro de pruebas, G-06.
 
 Evidencia **local** previa de la imagen en
 [evidencia/imagen-frontend-local.md](evidencia/imagen-frontend-local.md).

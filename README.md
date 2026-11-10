@@ -1,9 +1,8 @@
 # Librería · Global de Programación III
 
-**Grupo:** Las chicas (COMPLETAR: confirmar nombre del grupo)
+**Grupo:** Las chicas
 
-**Integrantes:** Agustina Fontagnol, Martina Suarez, Gianella Peña y Yoselie Aquino
-(COMPLETAR: confirmar la lista; el README del frontend de la etapa 1 solo nombraba a tres).
+**Integrantes:** Agustina Fontagnol, Gianella Peña, Martina Suarez y Yoselie Aquino
 
 Aplicación web de una librería: catálogo, altas de libros y clientes, ventas e historial.
 El frontend (HTML, CSS y JavaScript nativos) consume la API FastAPI de la librería y los datos
